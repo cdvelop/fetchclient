@@ -6,14 +6,14 @@ import (
 
 // action ej: "create","update","delete","upload" = "POST",  "file" and "read" == GET
 // object ej: patientcare.printdoc
-func (h fetchClient) SendOneRequest(action, object string, body_rq any, response func([]map[string]string, error)) {
-	var method = "GET"
-	switch action {
-	case "create", "update", "delete", "upload":
-		method = "POST"
+func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any, response func([]map[string]string, error)) {
+
+	var back string
+	if object != "" {
+		back = "/"
 	}
 
-	endpoint := action + "/" + object
+	endpoint = endpoint + back + object
 
 	var content_type = "application/json"
 
