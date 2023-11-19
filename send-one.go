@@ -57,6 +57,16 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 			ok = "false"
 		}
 
+		// status := res.Header.Get("Status")
+		// fmt.Println("ESTATUS GET:", status)
+
+		// if res.StatusCode != 200 {
+		// 	response(nil, model.Error(status))
+		// 	return
+		// }
+
+		// Decode := res.Header.Get("Decode")
+
 		h.Log("RESP OK:", ok, "status:", status, "text", msg)
 
 		// if len(server) != 2 {
