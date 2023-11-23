@@ -4,13 +4,13 @@ import (
 	"github.com/cdvelop/model"
 )
 
-func AddFetchAdapter(h *model.Handlers) error {
-	const err = "error fetchclient nil"
+func AddFetchAdapter(h *model.Handlers) (err string) {
+	const e = "error fetchclient nil "
 	if h.Logger == nil {
-		return model.Error(err, "Logger")
+		return e + "Logger"
 	}
 	if h.DataConverter == nil {
-		return model.Error(err, "DataConverter")
+		return e + "DataConverter"
 	}
 
 	f := fetchClient{
@@ -20,5 +20,5 @@ func AddFetchAdapter(h *model.Handlers) error {
 
 	h.FetchAdapter = f
 
-	return nil
+	return ""
 }

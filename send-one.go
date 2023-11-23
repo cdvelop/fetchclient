@@ -6,7 +6,7 @@ import (
 
 // action ej: "create","update","delete","upload" = "POST",  "file" and "read" == GET
 // object ej: patientcare.printdoc
-func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any, response func([]map[string]string, error)) {
+func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any, response func(result []map[string]string, err string)) {
 
 	var back string
 	if object != "" {
@@ -26,7 +26,7 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 	} else {
 
 		body_byte, err := h.EncodeMaps(body_rq, object)
-		if err != nil {
+		if err != "" {
 			response(nil, err)
 			return
 		}
@@ -61,7 +61,7 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 		// fmt.Println("ESTATUS GET:", status)
 
 		// if res.StatusCode != 200 {
-		// 	response(nil, model.Error(status))
+		// 	response(nil, status))
 		// 	return
 		// }
 
@@ -70,7 +70,7 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 		h.Log("RESP OK:", ok, "status:", status, "text", msg)
 
 		// if len(server) != 2 {
-		// 	return model.Error(msg)
+		// 	return msg)
 		// }
 
 		// Decodificar la respuesta
