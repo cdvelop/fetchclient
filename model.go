@@ -10,4 +10,8 @@ type fetchClient struct {
 	model.DataConverter
 	model.Logger
 	onComplete js.Func
+
+	// campos nuevos
+	// controller js.Value
+	abortController *js.Value
 }

@@ -13,7 +13,7 @@ func AddFetchAdapter(h *model.Handlers) (err string) {
 		return e + "DataConverter"
 	}
 
-	f := fetchClient{
+	f := &fetchClient{
 		DataConverter: h,
 		Logger:        h,
 	}

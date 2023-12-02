@@ -37,60 +37,49 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 	// h.Log("API endpoint:", endpoint)
 
 	// Crear una función JavaScript que se llamará cuando se complete la solicitud
-	h.onComplete = js.FuncOf(func(this js.Value, server []js.Value) interface{} {
-		// argumento 0 es el cuerpo de la respuesta de la solicitud Fetch, que debería ser una cadena de texto JSON.
+	h.onComplete = js.FuncOf(func(this js.Value, res []js.Value) interface{} {
+		// argumento 0 es el cuerpo de la respuesta de la solicitud Fetch
 		// argumento 1 indica si la promesa se resolvió o se rechazó.
 
-		h.Log("RESPUESTA:")
-		h.Log("TAMAÑO:", len(server))
-		h.Log(server[0])
+		h.Log("TAMAÑO:", len(res))
 
-		msg := server[0].Get("statusText").String() //Not Found
+		// Extraer el cuerpo de la respuesta usando el método text()
+		bodyPromise := res[0].Call("text")
 
-		status := server[0].Get("status").String() //<number: 404>
-		if status == "<number: 404>" {
-			msg += " 404"
-		}
+		// Manejar la promesa para obtener el cuerpo real
+		bodyPromise.Call("then", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			// args[0] contiene el cuerpo de la respuesta
 
-		ok := server[0].Get("ok").String() //<boolean: false>
-		if ok == "<boolean: false)>" {
-			ok = "false"
-		}
+			body := args[0].String()
+			h.Log("BODY:", body)
 
-		// status := res.Header.Get("Status")
-		// fmt.Println("ESTATUS GET:", status)
+			// statusText := res[0].Get("statusText").String() // Not Found
+			status_code := res[0].Get("status").String() // <number: 404>
+			h.Log("status_code:", status_code)
 
-		// if res.StatusCode != 200 {
-		// 	response(nil, status))
-		// 	return
-		// }
+			if status_code != "<number: 200>" {
+				response(nil, "error "+body)
+			}
 
-		// Decode := res.Header.Get("Decode")
+			// Liberar la función JavaScript
+			h.onComplete.Release()
 
-		h.Log("RESP OK:", ok, "status:", status, "text", msg)
-
-		// if len(server) != 2 {
-		// 	return msg)
-		// }
-
-		// Decodificar la respuesta
-		// responseData := h.DecodeResponses([]byte(server[0].String()))
-
-		// Llamar a la función de respuesta de Go con los datos decodificados
-		// clientReturn(responseData, nil)
-
-		// Liberar la función JavaScript
-		h.onComplete.Release()
+			return nil
+		}), js.Null())
 
 		return nil
 	})
 
+	fetchOptions := js.Global().Get("Object").New()
+	fetchOptions.Set("method", method)
+
+	if method != "GET" {
+		fetchOptions.Set("body", body)
+	}
+
+	fetchOptions.Set("headers", js.ValueOf(map[string]interface{}{"Content-Type": content_type}))
+
 	// Realizar la solicitud Fetch en JavaScript
-	js.Global().Get("fetch").Invoke(endpoint, js.ValueOf(map[string]interface{}{
-		"method": method,
-		"body":   body,
-		// "body":    js.ValueOf(string(body)),
-		"headers": js.ValueOf(map[string]interface{}{"Content-Type": content_type}),
-	})).Call("then", h.onComplete, js.Null())
+	js.Global().Get("fetch").Invoke(endpoint, fetchOptions).Call("then", h.onComplete, js.Null())
 
 }
