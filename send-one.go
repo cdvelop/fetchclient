@@ -20,11 +20,12 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 	var body string
 
 	// si envían un tipo objeto javascript
-	if body_form, ok := body_rq.(js.Value); !ok {
+	if body_form, ok := body_rq.(js.Value); ok {
 		body = body_form.String()
 		content_type = "multipart/form-data"
 	} else {
 
+		// h.Log("ENCODE MAPS?")
 		body_byte, err := h.EncodeMaps(body_rq, object)
 		if err != "" {
 			response(nil, err)
@@ -38,10 +39,6 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 
 	// Crear una función JavaScript que se llamará cuando se complete la solicitud
 	h.onComplete = js.FuncOf(func(this js.Value, res []js.Value) interface{} {
-		// argumento 0 es el cuerpo de la respuesta de la solicitud Fetch
-		// argumento 1 indica si la promesa se resolvió o se rechazó.
-
-		h.Log("TAMAÑO:", len(res))
 
 		// Extraer el cuerpo de la respuesta usando el método text()
 		bodyPromise := res[0].Call("text")
@@ -51,11 +48,11 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 			// args[0] contiene el cuerpo de la respuesta
 
 			body := args[0].String()
-			h.Log("BODY:", body)
+			h.Log("bodyPromise:", body)
 
 			// statusText := res[0].Get("statusText").String() // Not Found
 			status_code := res[0].Get("status").String() // <number: 404>
-			h.Log("status_code:", status_code)
+			// h.Log("status_code:", status_code)
 
 			if status_code != "<number: 200>" {
 				response(nil, "error "+body)
