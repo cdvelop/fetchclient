@@ -48,7 +48,7 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 			// args[0] contiene el cuerpo de la respuesta
 
 			body := args[0].String()
-			h.Log("bodyPromise:", body)
+			// h.Log("bodyPromise:", body)
 
 			// statusText := res[0].Get("statusText").String() // Not Found
 			status_code := res[0].Get("status").String() // <number: 404>
@@ -57,6 +57,13 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 			if status_code != "<number: 200>" {
 				response(nil, "error "+body)
 			}
+
+			out, err := h.DecodeMaps([]byte(body))
+			if err != "" {
+				response(nil, err)
+			}
+
+			response(out, "")
 
 			// Liberar la función JavaScript
 			h.onComplete.Release()
