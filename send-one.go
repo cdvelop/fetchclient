@@ -81,7 +81,12 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 		fetchOptions.Set("body", body)
 	}
 
-	fetchOptions.Set("headers", js.ValueOf(map[string]interface{}{"Content-Type": content_type}))
+	auth := h.AddHeaderAuthentication()
+
+	fetchOptions.Set("headers", js.ValueOf(map[string]interface{}{
+		"Content-Type": content_type,
+		auth.Name:      auth.Content,
+	}))
 
 	// Realizar la solicitud Fetch en JavaScript
 	js.Global().Get("fetch").Invoke(endpoint, fetchOptions).Call("then", h.onComplete, js.Null())

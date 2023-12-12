@@ -2,9 +2,7 @@ module github.com/cdvelop/fetchclient
 
 go 1.20
 
-require github.com/cdvelop/model v0.0.77
-
-require github.com/cdvelop/strings v0.0.7 // indirect
+require github.com/cdvelop/model v0.0.81
 
 replace github.com/cdvelop/model => ../model
 
