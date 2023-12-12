@@ -77,9 +77,9 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 	fetchOptions := js.Global().Get("Object").New()
 	fetchOptions.Set("method", method)
 
-	if method != "GET" {
-		fetchOptions.Set("body", body)
-	}
+	// if method != "GET" {
+	fetchOptions.Set("body", body)
+	// }
 
 	auth := h.AddHeaderAuthentication()
 
