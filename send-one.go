@@ -26,7 +26,7 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 	} else {
 
 		// h.Log("ENCODE MAPS?")
-		body_byte, err := h.EncodeMaps(body_rq, object)
+		body_byte, err := h.EncodeMaps(body_rq)
 		if err != "" {
 			response(nil, err)
 			return
@@ -62,6 +62,8 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 			if err != "" {
 				response(nil, err)
 			}
+
+			// h.Log("SALIDA FETCH:", out, err)
 
 			response(out, "")
 
