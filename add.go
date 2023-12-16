@@ -14,9 +14,8 @@ func AddFetchAdapter(h *model.Handlers) (err string) {
 	}
 
 	f := &fetchClient{
-		DataConverter:               h,
-		Logger:                      h,
-		HeaderAuthenticationAdapter: h.AuthFrontendAdapter,
+		DataConverter: h,
+		Logger:        h,
 	}
 
 	h.FetchAdapter = f

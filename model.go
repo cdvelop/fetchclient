@@ -14,6 +14,4 @@ type fetchClient struct {
 	// campos nuevos
 	// controller js.Value
 	abortController *js.Value
-
-	model.HeaderAuthenticationAdapter
 }
