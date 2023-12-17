@@ -4,7 +4,7 @@ import (
 	"github.com/cdvelop/model"
 )
 
-func AddFetchAdapter(h *model.Handlers) (err string) {
+func AddFetchAdapter(h *model.MainHandler) (err string) {
 	const e = "error fetchclient nil "
 	if h.Logger == nil {
 		return e + "Logger"

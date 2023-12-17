@@ -46,26 +46,28 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 		// Manejar la promesa para obtener el cuerpo real
 		bodyPromise.Call("then", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			// args[0] contiene el cuerpo de la respuesta
-
+			var err string
+			var data []map[string]string
 			body := args[0].String()
-			// h.Log("bodyPromise:", body)
+			// h.Log("bodyPromises 2:", body)
 
 			// statusText := res[0].Get("statusText").String() // Not Found
 			status_code := res[0].Get("status").String() // <number: 404>
 			// h.Log("status_code:", status_code)
 
 			if status_code != "<number: 200>" {
-				response(nil, "error "+body)
-			}
-
-			out, err := h.DecodeMaps([]byte(body))
-			if err != "" {
-				response(nil, err)
+				err = body
+			} else {
+				data, err = h.DecodeMaps([]byte(body))
 			}
 
 			// h.Log("SALIDA FETCH:", out, err)
 
-			response(out, "")
+			if err != "" {
+				response(nil, err)
+			} else {
+				response(data, "")
+			}
 
 			// Liberar la función JavaScript
 			h.onComplete.Release()
