@@ -17,14 +17,14 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 
 	var content_type = "application/json"
 
-	var body string
+	fetchOptions := js.Global().Get("Object").New()
+	fetchOptions.Set("method", method)
 
 	// si envían un tipo objeto javascript
-	if body_form, ok := body_rq.(js.Value); ok {
-		body = body_form.String()
-		content_type = "multipart/form-data"
+	if form, ok := body_rq.(js.Value); ok {
+		// h.Log("ENVIANDO TIPO multipart/form-data")
+		fetchOptions.Set("body", form)
 	} else {
-
 		// h.Log("ENCODE MAPS?")
 		body_byte, err := h.EncodeMaps(body_rq)
 		if err != "" {
@@ -32,11 +32,14 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 			return
 		}
 
-		body = string(body_byte)
+		fetchOptions.Set("body", string(body_byte))
+
+		fetchOptions.Set("headers", js.ValueOf(map[string]interface{}{
+			"Content-Type": content_type,
+		}))
 	}
 
 	// h.Log("API endpoint:", endpoint)
-
 	// Crear una función JavaScript que se llamará cuando se complete la solicitud
 	h.onComplete = js.FuncOf(func(this js.Value, res []js.Value) interface{} {
 
@@ -77,17 +80,6 @@ func (h fetchClient) SendOneRequest(method, endpoint, object string, body_rq any
 
 		return nil
 	})
-
-	fetchOptions := js.Global().Get("Object").New()
-	fetchOptions.Set("method", method)
-
-	// if method != "GET" {
-	fetchOptions.Set("body", body)
-	// }
-
-	fetchOptions.Set("headers", js.ValueOf(map[string]interface{}{
-		"Content-Type": content_type,
-	}))
 
 	// Realizar la solicitud Fetch en JavaScript
 	js.Global().Get("fetch").Invoke(endpoint, fetchOptions).Call("then", h.onComplete, js.Null())
